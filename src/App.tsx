@@ -1,13 +1,28 @@
 import { useState } from "react";
 import "./App.css"
-import { EventsList } from "./components/EventsList/EventsList";
-import { eventData } from "./Dataset";
+import { TalkList } from "./components/EventsList/TalkList";
+import { eventData as talkData } from "./Dataset";
+import { Talk } from "./types/Talk";
+
+function processDataset(): Array<Talk>
+{
+	const talks: Array<Talk> = [];
+
+	for (let i = 0; i < talkData.length; i++)
+	{
+		talks.push(new Talk(talkData[i]));
+	}
+
+	return talks;
+}
+
+const talks = processDataset();
 
 function App()
 {
 	return (
 		<>
-			<EventsList events={eventData}></EventsList>
+			<TalkList talks={talks}></TalkList>
 		</>
 	);
 }
