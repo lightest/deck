@@ -19,9 +19,9 @@ export default function SlidesPage({ talkId }: iSlidesPageProps)
 {
 	const [slides, setSlides] = useState([]);
 	const [currentSlide, setCurrentSlide] = useState(0);
+	console.log("component init");
 
-	const getSlideClassName = useCallback(
-	(idx: number): string =>
+	function getSlideClassName (idx: number): string
 	{
 		let slideClass = "";
 
@@ -39,28 +39,41 @@ export default function SlidesPage({ talkId }: iSlidesPageProps)
 		}
 
 		return `slide ${slideClass}`;
-	}, []);
+	};
 
 	useEffect(() =>
 	{
 		fetchSlides(talkId, setSlides);
 	}, [talkId]);
 
+	function onKeydown(e)
+	{
+		console.log(e.key);
+		if (e.key === "ArrowRight")
+		{
+			console.log(slides.length);
+			const newCurSlide = Math.min(currentSlide + 1, slides.length - 1);
+			console.log(newCurSlide);
+			setCurrentSlide(newCurSlide);
+		}
+		else if (e.key === "ArrowLeft")
+		{
+			const newCurSlide = Math.max(currentSlide - 1, 0);
+			console.log(newCurSlide);
+			setCurrentSlide(newCurSlide);
+		}
+	}
+
 	useEffect(() =>
 	{
-
-		function onKeydown()
-		{
-			console.log("");
-		}
-
 		window.addEventListener("keydown", onKeydown);
 
 		return () =>
 		{
+			console.log("component destroy");
 			window.removeEventListener("keydown", onKeydown);
 		};
-	}, []);
+	}, [slides, currentSlide]);
 
 	return <>
 		<div className="slides-container">
