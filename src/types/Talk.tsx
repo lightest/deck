@@ -8,6 +8,13 @@ export interface iTalk
 	tags: Array<string>,
 }
 
+export interface iSlide
+{
+	id: string,
+	img: string,
+	notes: string
+}
+
 export class Talk implements iTalk
 {
 	id;

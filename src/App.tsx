@@ -1,28 +1,30 @@
 import { useState } from "react";
-import "./App.css"
-import { TalkList } from "./components/EventsList/TalkList";
-import { eventData as talkData } from "./Dataset";
-import { Talk } from "./types/Talk";
-
-function processDataset(): Array<Talk>
-{
-	const talks: Array<Talk> = [];
-
-	for (let i = 0; i < talkData.length; i++)
+import
 	{
-		talks.push(new Talk(talkData[i]));
+		createBrowserRouter,
+		RouterProvider
+	} from "react-router-dom";
+import HomePage from "./routes/home/HomePage";
+import SlidesPage from "./routes/slides/SlidesPage";
+import "./App.css"
+
+
+const router = createBrowserRouter([
+	{
+		path: "/",
+		element: <HomePage></HomePage>
+	},
+	{
+		path: "slides",
+		element: <SlidesPage></SlidesPage>
 	}
-
-	return talks;
-}
-
-const talks = processDataset();
+]);
 
 function App()
 {
 	return (
 		<>
-			<TalkList talks={talks}></TalkList>
+			<RouterProvider router={router}></RouterProvider>
 		</>
 	);
 }
