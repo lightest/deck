@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import remoteAPI from "../../core/remoteAPI";
+import Networking from "../../core/Networking/Networking";
 import { iSlide } from "../../types/Talk";
 import "./SlidesPage.css";
 
@@ -11,7 +11,8 @@ interface iSlidesPageProps
 async function fetchSlides(talkId:string, setSlides: Function)
 {
 	console.log("fetching data", talkId);
-	const slides = await remoteAPI.fetchSlides(talkId);
+	const slides = await Networking.fetchSlides(talkId);
+	console.log(slides);
 	setSlides(slides);
 }
 

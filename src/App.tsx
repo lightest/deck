@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import
 	{
 		createBrowserRouter,
@@ -6,6 +6,7 @@ import
 	} from "react-router-dom";
 import HomePage from "./routes/home/HomePage";
 import SlidesPage from "./routes/slides/SlidesPage";
+import * as wsClient from "./core/Networking/WebsocketClient";
 import "./App.css"
 
 
@@ -20,8 +21,24 @@ const router = createBrowserRouter([
 	}
 ]);
 
+function connectToServer()
+{
+	wsClient.init()
+}
+
+function disconnect()
+{
+	wsClient.destroy();
+}
+
 function App()
 {
+	useEffect(() =>
+	{
+		connectToServer();
+		return disconnect;
+	}, []);
+
 	return (
 		<>
 			<RouterProvider router={router}></RouterProvider>
