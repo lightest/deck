@@ -22,6 +22,16 @@ export default function SlidesPage({ talkId }: iSlidesPageProps)
 	const [currentSlide, setCurrentSlide] = useState(0);
 	console.log("component init");
 
+	if (!talkId)
+	{
+		talkId = "45b5c459-5f2b-4d09-9afb-4f7598d92aa2";
+	}
+
+	useEffect(() =>
+	{
+		fetchSlides(talkId, setSlides);
+	}, [talkId]);
+
 	function getSlideClassName (idx: number): string
 	{
 		let slideClass = "";
@@ -41,11 +51,6 @@ export default function SlidesPage({ talkId }: iSlidesPageProps)
 
 		return `slide ${slideClass}`;
 	};
-
-	useEffect(() =>
-	{
-		fetchSlides(talkId, setSlides);
-	}, [talkId]);
 
 	function onKeydown(e)
 	{

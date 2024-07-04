@@ -3,10 +3,11 @@ const RECONNECT_TIMEOUT = 1500;
 const RETRY_MESSAGE_SEND_TIMEOUT = 1500;
 const MAX_RETRY_ATTEMPTS = 5;
 
-interface iPromiseMethods
+interface iPromisedMessages
 {
     resolve: Function,
-    reject: Function
+    reject: Function,
+    msg: any
 }
 
 interface iMessageResponse
@@ -17,7 +18,7 @@ interface iMessageResponse
 
 let socket: WebSocket;
 let reconnectTimeout: number | undefined = undefined;
-let promises: Record<string, iPromiseMethods> = {};
+let promises: Record<string, iPromisedMessages> = {};
 let retryTimouts:Array<number> = [];
 
 function retryConnect()
@@ -63,22 +64,42 @@ function retryMessageSend(msg: string, retryAttempt?: number)
     retryTimouts.push(messageSendRetryTimeout);
 }
 
+function processDanglingPromisedMessages()
+{
+    // Try to send again all dangling messages.
+    // Danglng message means the response for it wasn't received.
+    // That can happen due to socket error for instance.
+    for (let i in promises)
+    {
+        sendMessage(promises[i].msg);
+    }
+}
+
 function handleSocketOpen()
 {
     clearTimeout(reconnectTimeout);
     console.log("Socket is opened, sending hello.");
     socket.send(JSON.stringify({ msg: "hello from client!" }));
+    processDanglingPromisedMessages();
 }
 
 function handleSocketMessage(messageEvent:MessageEvent)
 {
     console.log("incoming ws message", messageEvent);
-    const msg:iMessageResponse = messageEvent.data;
 
-    if (msg.hasOwnProperty("id") && promises[msg.id])
+    try
     {
-        promises[msg.id].resolve(msg);
-        delete promises[msg.id];
+        const msg:iMessageResponse = JSON.parse(messageEvent.data);
+
+        if (msg.hasOwnProperty("id") && promises[msg.id])
+        {
+            promises[msg.id].resolve(msg);
+            delete promises[msg.id];
+        }
+    }
+    catch (err)
+    {
+        console.error("Caught an error while handling received message.", err);
     }
 }
 
@@ -139,7 +160,7 @@ export function sendMessageWithResponsePromise(msg: any): Promise<any>
 
     const requestPromise = new Promise((resolve, reject) =>
     {
-        promises[msg.id] = { resolve, reject };
+        promises[msg.id] = { resolve, reject, msg };
     });
 
     sendMessage(msg);
